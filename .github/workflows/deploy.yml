@@ -34,10 +34,16 @@ jobs:
   build-and-deploy:
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: ${{ env.PROJECT_ID != '' }}
     
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Check for secrets
+      run: |
+        if [ -z "${{ secrets.GCP_SA_KEY }}" ]; then
+          echo "GCP_SA_KEY secret not found. Skipping deployment."
+          exit 0
+        fi
     
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
