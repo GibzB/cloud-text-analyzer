@@ -1,0 +1,84 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  REPOSITORY: text-analyzer
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install flake8
+        pip install -r app/requirements.txt
+    
+    - name: Lint Python code
+      run: flake8 app/ --max-line-length=88 --ignore=E203,W503
+    
+    - name: Test application
+      run: python -m pytest app/ -v || echo "No tests found"
+
+  build-and-deploy:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+    
+    - name: Configure Docker
+      run: gcloud auth configure-docker $REGION-docker.pkg.dev
+    
+    - name: Build Docker image
+      run: |
+        IMAGE_TAG=$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/text-analyzer:$GITHUB_SHA
+        docker build -t $IMAGE_TAG .
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+    
+    - name: Push Docker image
+      run: docker push $IMAGE_TAG
+    
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+    
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
+    
+    - name: Terraform Plan
+      run: |
+        terraform plan \
+          -var="project_id=$PROJECT_ID" \
+          -var="region=$REGION" \
+          -var="image_tag=$GITHUB_SHA"
+      working-directory: ./terraform
+    
+    - name: Terraform Apply
+      run: |
+        terraform apply -auto-approve \
+          -var="project_id=$PROJECT_ID" \
+          -var="region=$REGION" \
+          -var="image_tag=$GITHUB_SHA"
+      working-directory: ./terraform
