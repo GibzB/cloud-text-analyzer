@@ -12,10 +12,10 @@ A simple text analysis API built with Flask and deployed on Google Cloud Platfor
 ## Architecture
 
 ```
-┌─────────────┐     ┌─────────────┐    ┌──────────────┐
-│   GitHub    │──▶  │ GitHub      ───▶│ Artifact     │
-│ Repository  │     │ Actions     │    │ Registry     │
-└─────────────┘     └─────────────┘    └──────────────┘
+┌─────────────┐      ┌─────────────┐      ┌──────────────┐
+│   GitHub    │────▶│ GitHub       | ───▶│ Artifact     │
+│ Repository  │      │ Actions     │      │ Registry     │
+└─────────────┘      └─────────────┘      └──────────────┘
                            │                     │
                            ▼                     │
                   ┌──────────────┐               │
