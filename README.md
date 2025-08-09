@@ -283,25 +283,25 @@ Response:
 ### Design Decisions
 
 **Why Cloud Run?**
-- **Serverless Security**: Automatic patching and infrastructure management by Google
-- **Built-in Authentication**: Native IAM integration eliminates custom auth implementation
-- **Network Isolation**: Private services by default with configurable ingress controls
-- **Auto-scaling**: Reduces attack surface by scaling to zero when not in use
+- **Serverless Security**: Automatic patching and infrastructure management by Google.
+- **Built-in Authentication**: Native IAM integration eliminates custom auth implementation.
+- **Network Isolation**: Private services by default with configurable ingress controls.
+- **Auto-scaling**: Reduces attack surface by scaling to zero when not in use.
 
 **Authentication Strategy**
-- **IAM-based Access Control**: Cloud Run service requires valid Google Cloud IAM credentials
-- **Service-to-Service Auth**: Uses Google's service account tokens for internal communication
-- **No API Keys**: Eliminates risk of hardcoded credentials in application code
+- **IAM-based Access Control**: Cloud Run service requires valid Google Cloud IAM credentials.
+- **Service-to-Service Auth**: Uses Google's service account tokens for internal communication.
+- **No API Keys**: Eliminates risk of hardcoded credentials in application code.
 
 **Container Security**
-- **Non-root User**: Application runs as unprivileged user (UID 1000) to limit container escape impact
-- **Minimal Base Image**: Uses distroless Python image to reduce attack surface
-- **Read-only Filesystem**: Container filesystem mounted as read-only where possible
+- **Non-root User**: Application runs as unprivileged user (UID 1000) to limit container escape impact.
+- **Minimal Base Image**: Uses distroless Python image to reduce attack surface.
+- **Read-only Filesystem**: Container filesystem mounted as read-only where possible.
 
 **Network Security**
 - **Private Ingress**: Service configured with `ingress: INGRESS_TRAFFIC_INTERNAL_ONLY`
-- **VPC Connector**: Routes traffic through private Google Cloud network
-- **No Public Internet**: Application cannot make outbound internet calls
+- **VPC Connector**: Routes traffic through private Google Cloud network.
+- **No Public Internet**: Application cannot make outbound internet calls.
 
 ### Security Implementation
 
@@ -474,9 +474,9 @@ gcloud iam service-accounts keys delete OLD_KEY_ID \
 ```
 
 **Security Monitoring**:
-- Enable Cloud Audit Logs for all IAM and Cloud Run operations
-- Set up alerting for unauthorized access attempts
-- Monitor service account key usage in Cloud Console
+- Enable Cloud Audit Logs for all IAM and Cloud Run operations.
+- Set up alerting for unauthorized access attempts.
+- Monitor service account key usage in Cloud Console.
 
 ## Changelog and Recent Updates
 
